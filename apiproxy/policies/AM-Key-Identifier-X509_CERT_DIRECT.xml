@@ -1,0 +1,13 @@
+<AssignMessage name="AM-Key-Identifier-X509_CERT_DIRECT">
+  <!--
+      With key_identifier_type: 'X509_CERT_DIRECT',
+      the resulting XML will have:
+
+
+      <KeyInfo><X509Data><X509Certificate>MIIE...
+  -->
+  <AssignVariable>
+    <Name>desired_key_identifier_type</Name>
+    <Value>X509_CERT_DIRECT</Value>
+  </AssignVariable>
+</AssignMessage>

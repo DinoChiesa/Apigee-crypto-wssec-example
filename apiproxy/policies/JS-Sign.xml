@@ -1,0 +1,16 @@
+<Javascript name="JS-Sign" timeLimit="200">
+  <Source>
+    <![CDATA[
+var unsigned = context.getVariable('request.content');
+var signed = crypto.wsSecRsaSign(unsigned, {
+  private_key: '{private.key.pem}',
+  certificate: '{public.cert.pem}',
+  key_identifier_type: '{desired_key_identifier_type}',
+  signing_method: 'rsa-sha256',
+  digest_method: 'sha256',
+  expires_in: '300s'
+});
+context.setVariable('signed_soap', signed);
+  ]]>
+  </Source>
+</Javascript>

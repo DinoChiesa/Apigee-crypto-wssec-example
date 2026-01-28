@@ -1,0 +1,12 @@
+<AssignMessage name="AM-Key-Identifier-BST_DIRECT_REFERENCE">
+  <!--
+      With key_identifier_type: 'BST_DIRECT_REFERENCE',
+      the resulting XML will have:
+
+       <KeyInfo><wssec:SecurityTokenReference><wssec:Reference ....
+  -->
+  <AssignVariable>
+    <Name>desired_key_identifier_type</Name>
+    <Value>BST_DIRECT_REFERENCE</Value>
+  </AssignVariable>
+</AssignMessage>

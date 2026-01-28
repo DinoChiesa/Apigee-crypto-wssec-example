@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<AssignMessage name="AM-Unsigned-Sample-Payload">
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <Set>
+    <Payload contentType="text/xml">
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ser="http://x.sample.com/services">
+  <soap:Header>
+    <ser:Profile>
+      <ser:Name>Apigee TEST</ser:Name>
+      <ser:Client>Apigee Client</ser:Client>
+      <ser:Adapter>SOAP API</ser:Adapter>
+      <ser:Machine>MBPRO</ser:Machine>
+    </ser:Profile>
+  </soap:Header>
+  <soap:Body>
+    <ser:Ping/>
+  </soap:Body>
+</soap:Envelope>
+</Payload>
+  </Set>
+</AssignMessage>

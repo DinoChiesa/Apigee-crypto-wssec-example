@@ -1,0 +1,18 @@
+<AssignMessage name="AM-Key-Identifier-RSA_KEY_VALUE">
+  <!--
+      With key_identifier_type: 'THUMBPRINT',
+      the resulting XML will have:
+
+    <KeyInfo>
+      <KeyValue>
+         <RSAKeyValue>
+           <Modulus>...</Modulus>
+           <Exponent>AQAB</Exponent>
+
+  -->
+
+  <AssignVariable>
+    <Name>desired_key_identifier_type</Name>
+    <Value>RSA_KEY_VALUE</Value>
+  </AssignVariable>
+</AssignMessage>

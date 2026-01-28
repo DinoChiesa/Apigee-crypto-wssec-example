@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<APIProxy revision="3" name="crypto-wssec">
+  <DisplayName>crypto-wssec</DisplayName>
+  <Description/>
+  <CreatedAt>1769565720147</CreatedAt>
+  <LastModifiedAt>1769565720147</LastModifiedAt>
+  <BasePaths>/crypto-wssec/sign</BasePaths>
+  <BasePaths>/crypto-wssec/validate</BasePaths>
+  <Policies>
+    <Policy>AM-Clean-Request-Headers-From-Response</Policy>
+    <Policy>AM-Inject-Proxy-Revision-Header</Policy>
+    <Policy>AM-Key-Variables</Policy>
+    <Policy>AM-Response</Policy>
+    <Policy>AM-Signed-Response</Policy>
+    <Policy>AM-Unsigned-Doc-as-Response</Policy>
+    <Policy>AM-Unsigned-Sample-Payload</Policy>
+    <Policy>JS-Sign-1</Policy>
+    <Policy>RF-Unknown-Request</Policy>
+  </Policies>
+  <ProxyEndpoints>
+    <ProxyEndpoint>sign</ProxyEndpoint>
+    <ProxyEndpoint>validate</ProxyEndpoint>
+  </ProxyEndpoints>
+</APIProxy>

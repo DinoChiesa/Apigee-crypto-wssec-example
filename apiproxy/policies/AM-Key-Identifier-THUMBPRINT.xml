@@ -1,0 +1,16 @@
+<AssignMessage name="AM-Key-Identifier-THUMBPRINT">
+  <!--
+      With key_identifier_type: 'THUMBPRINT',
+      the resulting XML will have:
+
+    <KeyInfo>
+       <wsse:SecurityTokenReference>
+         <wsse:KeyIdentifier
+               ValueType="http://docs.oasis-open.org/wss/oasis-wss-soap-message-security1.1#ThumbprintSHA1">...
+
+  -->
+  <AssignVariable>
+    <Name>desired_key_identifier_type</Name>
+    <Value>THUMBPRINT</Value>
+  </AssignVariable>
+</AssignMessage>

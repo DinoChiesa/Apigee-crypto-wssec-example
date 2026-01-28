@@ -1,0 +1,12 @@
+<AssignMessage name="AM-Key-Identifier-ISSUER_SERIAL">
+  <!--
+      With key_identifier_type: 'ISSUER_SERIAL',
+      the resulting XML will have:
+
+      <KeyInfo><wssec:SecurityTokenReference wsu:Id="STR-102"><X509Data><X509IssuerSerial><X509IssuerName>...</X509IssuerName><X509SerialNumber>...
+  -->
+  <AssignVariable>
+    <Name>desired_key_identifier_type</Name>
+    <Value>ISSUER_SERIAL</Value>
+  </AssignVariable>
+</AssignMessage>
