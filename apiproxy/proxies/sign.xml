@@ -26,6 +26,9 @@
       <Step>
         <Name>AM-Clean-Request-Headers-From-Response</Name>
       </Step>
+      <Step>
+        <Name>JS-Remove-Client-Cert-Headers</Name>
+      </Step>
     </Response>
   </PreFlow>
 
@@ -40,6 +43,12 @@
       <Step>
         <Name>AM-Inject-Proxy-Revision-Header</Name>
       </Step>
+        <Step>
+          <Name>AM-Signed-Response</Name>
+          <Condition>
+            (request.verb = "GET") AND (proxy.pathsuffix ~~ "/t[12345]")
+          </Condition>
+        </Step>
     </Response>
   </PostFlow>
 
@@ -62,11 +71,6 @@
           <Name>AM-Key-Identifier-BST_DIRECT_REFERENCE</Name>
         </Step>
       </Request>
-      <Response>
-        <Step>
-          <Name>AM-Signed-Response</Name>
-        </Step>
-      </Response>
       <Condition>(proxy.pathsuffix MatchesPath "/t1") and (request.verb = "GET")</Condition>
     </Flow>
 
@@ -76,11 +80,6 @@
           <Name>AM-Key-Identifier-X509_CERT_DIRECT</Name>
         </Step>
       </Request>
-      <Response>
-        <Step>
-          <Name>AM-Signed-Response</Name>
-        </Step>
-      </Response>
       <Condition>(proxy.pathsuffix MatchesPath "/t2") and (request.verb = "GET")</Condition>
     </Flow>
 
@@ -90,11 +89,6 @@
           <Name>AM-Key-Identifier-ISSUER_SERIAL</Name>
         </Step>
       </Request>
-      <Response>
-        <Step>
-          <Name>AM-Signed-Response</Name>
-        </Step>
-      </Response>
       <Condition>(proxy.pathsuffix MatchesPath "/t3") and (request.verb = "GET")</Condition>
     </Flow>
 
@@ -104,11 +98,6 @@
           <Name>AM-Key-Identifier-THUMBPRINT</Name>
         </Step>
       </Request>
-      <Response>
-        <Step>
-          <Name>AM-Signed-Response</Name>
-        </Step>
-      </Response>
       <Condition>(proxy.pathsuffix MatchesPath "/t4") and (request.verb = "GET")</Condition>
     </Flow>
 
@@ -118,11 +107,6 @@
           <Name>AM-Key-Identifier-RSA_KEY_VALUE</Name>
         </Step>
       </Request>
-      <Response>
-        <Step>
-          <Name>AM-Signed-Response</Name>
-        </Step>
-      </Response>
       <Condition>(proxy.pathsuffix MatchesPath "/t5") and (request.verb = "GET")</Condition>
     </Flow>
 
@@ -132,8 +116,6 @@
           <Name>RF-Unknown-Request</Name>
         </Step>
       </Request>
-      <Response>
-      </Response>
     </Flow>
 
   </Flows>

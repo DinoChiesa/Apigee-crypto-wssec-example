@@ -5,7 +5,42 @@ This is documented [here](https://docs.cloud.google.com/apigee/docs/api-platform
 
 You can access this capability from within a JavaScript callout.
 
-This repo provides some examples showing how to use that new feature
+This repo provides some examples showing how to use that new feature.
+
+
+A WS-Security signed document usually follows this structure:
+
+```xml
+<soap:Envelope
+    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+  <soap:Header>
+    <wssec:Security
+        xmlns:wssec="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd" soap:mustUnderstand="1">
+      <wsu:Timestamp wsu:Id="TS-100">
+        <wsu:Created>2026-01-29T02:54:51Z</wsu:Created>
+        <wsu:Expires>2026-01-29T02:56:51Z</wsu:Expires>
+      </wsu:Timestamp>
+      <Signature xmlns="http://www.w3.org/2000/09/xmldsig#">
+        <SignedInfo>
+          <CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+          <SignatureMethod Algorithm="http://www.w3.org/2001/04/xmldsig-more#rsa-sha256"/>
+          <Reference URI="#Body-102">...
+        </SignedInfo>
+        <SignatureValue>kn7...</SignatureValue>
+        <KeyInfo>...</KeyInfo>
+      </Signature>
+    </wssec:Security>
+  </soap:Header>
+  ....
+```
+
+That is, there's a `soap:Header`, and within that a `wssec:Security` element,
+which contains a `Signature`. The `Signature` element provides information about
+how the signature has been computed, and information about the key used for
+signing.  While different algorithms and keys can be used, this capability
+within Apigee provides support only for RSA signing at this time.
+
 
 ## License and Copyright
 
@@ -48,10 +83,21 @@ TOKEN=$(gcloud auth print-access-token)
 apigeecli apis create bundle -f apiproxy \
   --name crypto-wssec -o $ORG_NAME --token $TOKEN
 
-apigeecli apis deploy --wait --name crypto-wssec --ovr --org $ORG_NAME --env $ENV_NAME --token $TOKEN
+apigeecli apis deploy --wait --name crypto-wssec \
+  --ovr --org $ORG_NAME --env $ENV_NAME --token $TOKEN
 ```
 
 On Windows, you can run the equivalent commands.
+
+```
+$TOKEN = $(gcloud auth print-access-token)
+
+apigeecli apis create bundle -f apiproxy `
+  --name crypto-wssec -o $ORG_NAME --token $TOKEN
+
+apigeecli apis deploy --wait --name crypto-wssec `
+  --ovr --org $ORG_NAME --env $ENV_NAME --token $TOKEN
+```
 
 
 
@@ -82,7 +128,6 @@ Certificates are not secret - it's ok to embed a cert into any public document.
 
 But you should never embed a private key into a configuration file that is openly readable. **This is ok only for
 demonstration purposes**.
-
 
 
 ### Variations in Signing
@@ -225,6 +270,154 @@ The output signed document will have a `KeyInfo` element that looks like so:
   </KeyInfo>
 ```
 
+
+## Validation examples
+
+The validation examples all work similarly: they obtain a signed document, and then validate it using
+either the certificate that is  in the document, or a certificate provided by the validator (Apigee).
+
+The basic usage is:
+
+```
+var isValid = crypto.wsSecRsaValidate(signed, options);
+```
+
+...where `signed` is a string containing the XML of the WS-Security signed
+document, and `options` is a JS object containing options for the validation.
+For example,
+
+```js
+var options =  {
+    certificate : '{public.cert.pem}',
+    ignore_certificate_expiry: 'false',
+    signing_method: 'rsa-sha256'
+  };
+
+// -or-
+
+var options =  {
+    accept_thumbprints: '{public.cert.thumbprint.sha1.hex}',
+    ignore_certificate_expiry: 'false',
+    signing_method: 'rsa-sha256'
+  };
+
+```
+
+
+Whether you must use `certificate` or `accept_thumbprints` depends on the `KeyInfo` element in the signed document:
+
+- When `KeyInfo` in the signed document includes `X509Data/X509Certificate`, or
+  `<wssec:SecurityTokenReference>` pointint to `BinarySecurityToken`, then the
+  validator can use the certificate embedded within the signed document.
+
+- When `KeyInfo` in the signed document points to an issuer/Serial or a thumbprint, the
+  validator must explicitly provide the certificate used to validate.
+
+
+Some concrete examples follow:
+
+### `KeyInfo` contains a `SecurityTokenReference`
+
+Request validation with this variant, like this:
+
+```
+curl -i "${apigee}/crypto-wssec/validate/t1"
+```
+
+On success, you will see the signed document in output.
+
+When validating a signature using the certificate that is embedded in the signed
+document, it is essential to validate the thumbprint of the certificate as
+well. This second step insures that the signed document has been signed with a
+certificate that the validator trusts. If the validator did not check the
+thumbprint, then... any document signed with any key, would be treated as valid.
+And you don't want that.
+
+Validation of the thumbprint is done by the `crypto.wsSecRsaValidate()` method,
+when you pass a `accept_thumbprints` field in the options. This is done in the
+JS-Validate step like so:
+
+```js
+// In some cases, the validator must explicitly supply the cert.
+var specifyCert = context.getVariable('validator-provides-the-certificate');
+if (specifyCert) {
+  options.certificate = '{public.cert.pem}';
+}
+else {
+  options.accept_thumbprints = '{public.cert.thumbprint.sha1.hex}';
+}
+```
+
+
+
+### `KeyInfo` contains `<X509Data>/<X509Certificate>`
+
+
+Request validation with this variant, like this:
+
+```
+curl -i "${apigee}/crypto-wssec/validate/t2"
+```
+
+
+### `KeyInfo` contains `X509IssuerSerial`
+
+Request this variant of the validation like this:
+```
+curl -i "${apigee}/crypto-wssec/validate/t3"
+```
+
+A thumbprint is not enough to validate a signature. The validator needs a
+certificate, or a public key.  In this case, the logic in the API proxy
+explicitly provides the certificate to use for validation. It does this in the
+logic within the JS-Validate step:
+
+```js
+// In some cases, the validator must explicitly supply the cert.
+var specifyCert = context.getVariable('validator-provides-the-certificate');
+if (specifyCert) {
+  options.certificate = '{public.cert.pem}';
+}
+else {
+  options.accept_thumbprints = '{public.cert.thumbprint.sha1.hex}';
+}
+```
+
+
+If the logic _did not_ provide the certificate, you would see this error:
+```xml
+<error>
+  <reason>certificate is missing</reason>
+</error>
+```
+
+
+### `KeyInfo` contains `wssec:KeyIdentifier` with a value of `ThumbprintSHA1`
+
+Request this variant of the validation like this:
+```
+curl -i "${apigee}/crypto-wssec/validate/t4"
+```
+
+A thumbprint is not enough to validate a signature. The validator needs a certificate, or a public key.
+As in case t3, the logic in the API proxy provides the certificate to use for validation.
+
+### `KeyInfo` contains `<KeyValue>/<RSAKeyValue>`
+
+Request this variant of the validation like this:
+```
+curl -i "${apigee}/crypto-wssec/validate/t5"
+```
+
+This is not supported by the validator, at this time. So you will see an error:
+
+```xml
+<error>
+  <reason>No suitable child element of KeyInfo</reason>
+</error>
+```
+
+At this time, this is expected.
 
 
 ## Support

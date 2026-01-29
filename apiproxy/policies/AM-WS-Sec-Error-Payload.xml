@@ -1,0 +1,10 @@
+<AssignMessage name="AM-WS-Sec-Error-Payload">
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <Set>
+    <Payload contentType="text/xml"><error>
+      <reason>{wssec_error}</reason>
+</error>
+</Payload>
+    <StatusCode>500</StatusCode>
+  </Set>
+</AssignMessage>

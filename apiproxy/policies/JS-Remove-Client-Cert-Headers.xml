@@ -1,0 +1,15 @@
+<Javascript name="JS-Remove-Client-Cert-Headers" timeLimit="200">
+  <Source>
+    <![CDATA[
+
+context.getVariable('response.headers.names.string')
+  .split(',')
+  .forEach(name => {
+    if (name.toLowerCase().startsWith('x-client-cert-')) {
+      context.removeVariable('response.header.' + name);
+    }
+  });
+
+]]>
+  </Source>
+</Javascript>

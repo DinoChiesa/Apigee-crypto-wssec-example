@@ -1,0 +1,9 @@
+<AssignMessage name="AM-Validation-Response">
+  <IgnoreUnresolvedVariables>true</IgnoreUnresolvedVariables>
+  <Set>
+    <Payload contentType="text/xml">{scResponse.content}
+</Payload>
+    <ReasonPhrase>OK</ReasonPhrase>
+    <StatusCode>200</StatusCode>
+  </Set>
+</AssignMessage>

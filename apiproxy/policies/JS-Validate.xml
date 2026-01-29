@@ -1,0 +1,47 @@
+<Javascript name="JS-Validate" timeLimit="200">
+  <!--
+      Something is different w.r.t. extracting the Timestamp
+      values from a signed document, and this is resulting in an
+      validation error.
+
+      The runtime is saying that the lifetime of the signature is not long
+      enough.  Using reasonable values like:
+
+      max_lifetime: '5m',
+      max_lifetime: '300s',
+
+      ...always results in:
+         "Lifetime of the document exceeds configured maximum"
+
+      I think there is something wrong with the extraction of timestamps.
+
+      For now, avoid using max_lifetime.
+  -->
+  <Source>
+    <![CDATA[
+var signed = context.getVariable('scResponse.content');
+var options =  {
+    debug: "true",
+    // max_lifetime: '300s',
+    ignore_certificate_expiry: 'false',
+    signing_method: 'rsa-sha256',
+  };
+
+// In some cases, the validator must explicitly supply the cert.
+var specifyCert = context.getVariable('validator-provides-the-certificate');
+if (specifyCert) {
+  options.certificate = '{public.cert.pem}';
+}
+else {
+  options.accept_thumbprints = '{public.cert.thumbprint.sha1.hex}';
+}
+
+var isValid = crypto.wsSecRsaValidate(signed, options);
+
+if (!isValid) {
+  throw new Error("invalid signature");
+}
+
+  ]]>
+  </Source>
+</Javascript>

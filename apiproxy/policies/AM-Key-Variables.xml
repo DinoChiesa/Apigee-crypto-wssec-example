@@ -64,4 +64,15 @@ ef1iXmNHSdkzxAzLShqIqHae0R3L0Ey6jbwm3cVQ2Vs/eGWgulauxIeDX4UeLnph
 -----END CERTIFICATE-----
     </Value>
   </AssignVariable>
+
+  <AssignVariable>
+    <Name>public.cert.thumbprint.sha1.b64</Name>
+    <Value>XP+3Qo0nY3M7KaVNSSfHqUebFCc=</Value>
+  </AssignVariable>
+
+  <AssignVariable>
+    <Name>public.cert.thumbprint.sha1.hex</Name>
+    <Value>5C:FF:B7:42:8D:27:63:73:3B:29:A5:4D:49:27:C7:A9:47:9B:14:27</Value>
+  </AssignVariable>
+
 </AssignMessage>

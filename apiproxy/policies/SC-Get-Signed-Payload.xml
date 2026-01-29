@@ -1,0 +1,18 @@
+<ServiceCallout name="SC-Get-Signed-Payload">
+  <Request clearPayload="false" variable="scMessage">
+    <Set>
+      <Verb>GET</Verb>
+    </Set>
+  </Request>
+  <Response>scResponse</Response>
+  <LocalTargetConnection>
+    <!--
+        Call back to the sign endpoint of this bundle.
+        If the inbound call is /validate/t1, the
+        outbound call is /sign/t1.
+        /validate/t2 => /sign/t2
+        and so on.
+    -->
+    <Path>/crypto-wssec/sign{proxy.pathsuffix}</Path>
+  </LocalTargetConnection>
+</ServiceCallout>

@@ -1,4 +1,10 @@
 <Javascript name="JS-Sign" timeLimit="200">
+  <!--
+    Notes:
+    - Using expiry tells the runtime to add a wsu:Timestamp with a wsu:Expires child
+    - key_identifier_type drives the format of KeyInfo in the output signed document
+    - the meaning of the other elements should be easy to infer
+  -->
   <Source>
     <![CDATA[
 var unsigned = context.getVariable('request.content');
@@ -8,7 +14,7 @@ var signed = crypto.wsSecRsaSign(unsigned, {
   key_identifier_type: '{desired_key_identifier_type}',
   signing_method: 'rsa-sha256',
   digest_method: 'sha256',
-  expires_in: '300s'
+  expiry: '120s'
 });
 context.setVariable('signed_soap', signed);
   ]]>

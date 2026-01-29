@@ -1,0 +1,6 @@
+<AssignMessage name="AM-Set-Provide-Cert-Flag">
+  <AssignVariable>
+    <Name>validator-provides-the-certificate</Name>
+    <Value>true</Value>
+  </AssignVariable>
+</AssignMessage>
