@@ -287,34 +287,42 @@ document, and `options` is a JS object containing options for the validation.
 For example,
 
 ```js
+// Validate with a certificate that is available in the API Proxy.
 var options =  {
     certificate : '{public.cert.pem}',
     ignore_certificate_expiry: 'false',
     signing_method: 'rsa-sha256'
   };
+var isValid = crypto.wsSecRsaValidate(signed, options);
 
 // -or-
 
+// Validate with the certificate that is found within the signed document, and
+// specify the list of cert thumbprints that are acceptable.
 var options =  {
     accept_thumbprints: '{public.cert.thumbprint.sha1.hex}',
     ignore_certificate_expiry: 'false',
     signing_method: 'rsa-sha256'
   };
+var isValid = crypto.wsSecRsaValidate(signed, options);
 
 ```
 
-
-Whether you must use `certificate` or `accept_thumbprints` depends on the `KeyInfo` element in the signed document:
+**You must provide one of `certificate` or `accept_thumbprints` in the
+options.**   Whether you must use `certificate` or `accept_thumbprints` depends on
+the `KeyInfo` element in the signed document:
 
 - When `KeyInfo` in the signed document includes `X509Data/X509Certificate`, or
   `<wssec:SecurityTokenReference>` pointint to `BinarySecurityToken`, then the
-  validator can use the certificate embedded within the signed document.
+  validator will use the certificate embedded within the signed document, and you
+  must provide a thumbprint to check that the certificate in the signed document
+  is trusted.
 
 - When `KeyInfo` in the signed document points to an issuer/Serial or a thumbprint, the
   validator must explicitly provide the certificate used to validate.
 
 
-Some concrete examples follow:
+Some concrete examples follow.
 
 ### `KeyInfo` contains a `SecurityTokenReference`
 
@@ -329,13 +337,15 @@ On success, you will see the signed document in output.
 When validating a signature using the certificate that is embedded in the signed
 document, it is essential to validate the thumbprint of the certificate as
 well. This second step insures that the signed document has been signed with a
-certificate that the validator trusts. If the validator did not check the
-thumbprint, then... any document signed with any key, would be treated as valid.
+certificate that the validator trusts. If the validator did not perform this check, or
+a similar check, then... any document signed with any key, would be treated as valid.
 And you don't want that.
 
 Validation of the thumbprint is done by the `crypto.wsSecRsaValidate()` method,
-when you pass a `accept_thumbprints` field in the options. This is done in the
-JS-Validate step like so:
+using the thumbprints provided in either the `accept_thumbprints` field, or the `accept_thumbprints_s256` field, 
+in the options. 
+
+This is done in the JS-Validate step like so:
 
 ```js
 // In some cases, the validator must explicitly supply the cert.
@@ -351,7 +361,6 @@ else {
 
 
 ### `KeyInfo` contains `<X509Data>/<X509Certificate>`
-
 
 Request validation with this variant, like this:
 
